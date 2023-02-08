@@ -5,6 +5,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
+type ErrorDetails struct {
+	Status  int    `json:status,omitempty`
+	Message string `json:message,omitempty`
+}
+
 func ExtractString(d *schema.ResourceData, key string) string {
 	return ToString(d.Get(key))
 }

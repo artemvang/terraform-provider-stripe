@@ -2,6 +2,7 @@ package stripe
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -128,6 +129,12 @@ func resourceStripeCustomerRead(_ context.Context, d *schema.ResourceData, m int
 
 	customer, err := c.Customers.Get(d.Id(), nil)
 	if err != nil {
+		var errorDetails ErrorDetails
+		json.Unmarshal([]byte(err.Error()), &errorDetails)
+		if errorDetails.Status == 404 {
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
