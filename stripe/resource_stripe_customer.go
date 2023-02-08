@@ -468,6 +468,12 @@ func resourceStripeCustomerDelete(_ context.Context, d *schema.ResourceData, m i
 
 	_, err := c.Customers.Del(d.Id(), nil)
 	if err != nil {
+		var errorDetails ErrorDetails
+		json.Unmarshal([]byte(err.Error()), &errorDetails)
+		if errorDetails.Status == 404 {
+			d.SetId("")
+			return nil
+		}
 		return diag.FromErr(err)
 	}
 
