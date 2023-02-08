@@ -1,4 +1,4 @@
-module github.com/lukasaron/terraform-provider-stripe
+module github.com/artemvang/terraform-provider-stripe
 
 go 1.19
 
