@@ -146,23 +146,26 @@ func resourceStripeCustomerRead(_ context.Context, d *schema.ResourceData, m int
 		d.Set("phone", customer.Phone),
 		func() error {
 			addressMap := make(map[string]interface{})
-			if customer.Address.Line1 != "" {
-				addressMap["line1"] = customer.Address.Line1
-			}
-			if customer.Address.Line2 != "" {
-				addressMap["line2"] = customer.Address.Line2
-			}
-			if customer.Address.City != "" {
-				addressMap["city"] = customer.Address.City
-			}
-			if customer.Address.State != "" {
-				addressMap["state"] = customer.Address.State
-			}
-			if customer.Address.PostalCode != "" {
-				addressMap["postal_code"] = customer.Address.PostalCode
-			}
-			if customer.Address.Country != "" {
-				addressMap["country"] = customer.Address.Country
+			if customer.Address != nil {
+				address := customer.Address
+				if address.Line1 != "" {
+					addressMap["line1"] = address.Line1
+				}
+				if address.Line2 != "" {
+					addressMap["line2"] = address.Line2
+				}
+				if address.City != "" {
+					addressMap["city"] = address.City
+				}
+				if address.State != "" {
+					addressMap["state"] = address.State
+				}
+				if address.PostalCode != "" {
+					addressMap["postal_code"] = address.PostalCode
+				}
+				if address.Country != "" {
+					addressMap["country"] = address.Country
+				}
 			}
 
 			return d.Set("address", addressMap)
@@ -170,29 +173,36 @@ func resourceStripeCustomerRead(_ context.Context, d *schema.ResourceData, m int
 		func() error {
 			if customer.Shipping != nil {
 				shippingMap := make(map[string]interface{})
-				if customer.Shipping.Name != "" {
-					shippingMap["name"] = customer.Shipping.Name
-				}
-				if customer.Shipping.Phone != "" {
-					shippingMap["phone"] = customer.Shipping.Phone
-				}
-				if customer.Shipping.Address.Line1 != "" {
-					shippingMap["line1"] = customer.Shipping.Address.Line1
-				}
-				if customer.Shipping.Address.Line2 != "" {
-					shippingMap["line2"] = customer.Shipping.Address.Line2
-				}
-				if customer.Shipping.Address.City != "" {
-					shippingMap["city"] = customer.Shipping.Address.City
-				}
-				if customer.Shipping.Address.State != "" {
-					shippingMap["state"] = customer.Shipping.Address.State
-				}
-				if customer.Shipping.Address.PostalCode != "" {
-					shippingMap["postal_code"] = customer.Shipping.Address.PostalCode
-				}
-				if customer.Shipping.Address.Country != "" {
-					shippingMap["country"] = customer.Shipping.Address.Country
+				if customer.Shipping != nil {
+					shipping := customer.Shipping
+
+					if shipping.Name != "" {
+						shippingMap["name"] = shipping.Name
+					}
+					if shipping.Phone != "" {
+						shippingMap["phone"] = shipping.Phone
+					}
+					if shipping.Address != nil {
+						address := shipping.Address
+						if address.Line1 != "" {
+							shippingMap["line1"] = address.Line1
+						}
+						if address.Line2 != "" {
+							shippingMap["line2"] = address.Line2
+						}
+						if address.City != "" {
+							shippingMap["city"] = address.City
+						}
+						if address.State != "" {
+							shippingMap["state"] = address.State
+						}
+						if address.PostalCode != "" {
+							shippingMap["postal_code"] = address.PostalCode
+						}
+						if address.Country != "" {
+							shippingMap["country"] = address.Country
+						}
+					}
 				}
 				return d.Set("shipping", shippingMap)
 			}
@@ -209,14 +219,17 @@ func resourceStripeCustomerRead(_ context.Context, d *schema.ResourceData, m int
 		func() error {
 			if customer.InvoiceSettings != nil {
 				invoiceSettingsMap := make(map[string]interface{})
-				if customer.InvoiceSettings.Footer != "" {
-					invoiceSettingsMap["footer"] = customer.InvoiceSettings.Footer
-				}
-				if customer.InvoiceSettings.DefaultPaymentMethod != nil {
-					invoiceSettingsMap["default_payment_method"] = customer.InvoiceSettings.DefaultPaymentMethod.ID
-				}
-				for _, field := range customer.InvoiceSettings.CustomFields {
-					invoiceSettingsMap[field.Name] = field.Value
+				if customer.InvoiceSettings != nil {
+					invoiceSettings := customer.InvoiceSettings
+					if invoiceSettings.Footer != "" {
+						invoiceSettingsMap["footer"] = invoiceSettings.Footer
+					}
+					if invoiceSettings.DefaultPaymentMethod != nil {
+						invoiceSettingsMap["default_payment_method"] = invoiceSettings.DefaultPaymentMethod.ID
+					}
+					for _, field := range invoiceSettings.CustomFields {
+						invoiceSettingsMap[field.Name] = field.Value
+					}
 				}
 
 				return d.Set("invoice_settings", invoiceSettingsMap)
@@ -448,7 +461,6 @@ func resourceStripeCustomerUpdate(ctx context.Context, d *schema.ResourceData, m
 	}
 
 	return resourceStripeCustomerRead(ctx, d, m)
-
 }
 
 func resourceStripeCustomerDelete(_ context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
